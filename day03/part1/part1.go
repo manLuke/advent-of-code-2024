@@ -17,7 +17,7 @@ func Solve() {
 
 func getResultOfMultiplication(src string) int {
 	var validOrder = [6]TokenType{Mul, OpenParen, Int, Comma, Int, CloseParen}
-	tokens := tokenize(&src)
+	tokens := tokenize(src)
 	i := 1
 	sum := 0
 
@@ -39,11 +39,11 @@ func getResultOfMultiplication(src string) int {
 	return sum
 }
 
-func tokenize(src *string) []Token {
+func tokenize(src string) []Token {
 	i := 0
 	var tokens []Token
 
-	for i < len(*src) {
+	for i < len(src) {
 		newToken := parseToken(src, &i)
 		tokens = append(tokens, newToken)
 		i++
@@ -52,16 +52,16 @@ func tokenize(src *string) []Token {
 	return tokens
 }
 
-func parseToken(src *string, i *int) Token {
-	if token, status := tokenizeInt(*src, i); status {
+func parseToken(src string, i *int) Token {
+	if token, status := tokenizeInt(src, i); status {
 		return token
-	} else if token, status := tokenizePattern(*src, i, "mul", Mul); status {
+	} else if token, status := tokenizePattern(src, i, "mul", Mul); status {
 		return token
-	} else if token, status := tokenizePattern(*src, i, "(", OpenParen); status {
+	} else if token, status := tokenizePattern(src, i, "(", OpenParen); status {
 		return token
-	} else if token, status := tokenizePattern(*src, i, ",", Comma); status {
+	} else if token, status := tokenizePattern(src, i, ",", Comma); status {
 		return token
-	} else if token, status := tokenizePattern(*src, i, ")", CloseParen); status {
+	} else if token, status := tokenizePattern(src, i, ")", CloseParen); status {
 		return token
 	}
 	return Token{Type: Invalid}

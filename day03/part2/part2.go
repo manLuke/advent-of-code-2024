@@ -11,34 +11,34 @@ import (
 
 func Solve() {
 	fmt.Println("Advent of Code - Day 3 - Part 2")
-	result := getResultOfMultiplication(getMemory())
+	result := processCorruptedMemory(getMemory())
 	fmt.Println("Result:", result)
 }
 
-func getResultOfMultiplication(src string) int {
-	var (
-		doOrder   = []TokenType{Do, OpenParen, CloseParen}
-		dontOrder = []TokenType{Do, Not, OpenParen, CloseParen}
-		mulOrder  = []TokenType{Mul, OpenParen, Int, Comma, Int, CloseParen}
-	)
-	tokens := tokenize(&src)
+func processCorruptedMemory(src string) int {
+	tokens := tokenize(src)
+	return calculateEnabledMultiplications(tokens)
+}
+
+func calculateEnabledMultiplications(tokens []Token) int {
 	i := 1
 	sum := 0
 	enabled := true
 
 	for i < len(tokens) {
-		if matchTokens(tokens, i, doOrder) {
+		switch {
+		case isTokenSequence(tokens, i, []TokenType{Do, OpenParen, CloseParen}):
 			enabled = true
-			i += len(doOrder)
-		} else if matchTokens(tokens, i, dontOrder) {
+			i += 3
+		case isTokenSequence(tokens, i, []TokenType{Do, Not, OpenParen, CloseParen}):
 			enabled = false
-			i += len(dontOrder)
-		} else if !enabled {
+			i += 4
+		case !enabled:
 			i++
-		} else if matchTokens(tokens, i, mulOrder) {
+		case isTokenSequence(tokens, i, []TokenType{Mul, OpenParen, Int, Comma, Int, CloseParen}):
 			sum += tokens[i+2].Value * tokens[i+4].Value
-			i += len(mulOrder)
-		} else {
+			i += 6
+		default:
 			i++
 		}
 	}
@@ -46,20 +46,20 @@ func getResultOfMultiplication(src string) int {
 	return sum
 }
 
-func matchTokens(tokens []Token, i int, validOrder []TokenType) bool {
-	for j, tokenType := range validOrder {
-		if i+j >= len(tokens) || tokens[i+j].Type != tokenType {
+func isTokenSequence(tokens []Token, i int, sequence []TokenType) bool {
+	for j, expectedType := range sequence {
+		if i+j >= len(tokens) || tokens[i+j].Type != expectedType {
 			return false
 		}
 	}
 	return true
 }
 
-func tokenize(src *string) []Token {
+func tokenize(src string) []Token {
 	i := 0
 	var tokens []Token
 
-	for i < len(*src) {
+	for i < len(src) {
 		newToken := parseToken(src, &i)
 		tokens = append(tokens, newToken)
 		i++
@@ -68,22 +68,35 @@ func tokenize(src *string) []Token {
 	return tokens
 }
 
-func parseToken(src *string, i *int) Token {
-	if token, status := tokenizeInt(*src, i); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, "mul", Mul); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, "(", OpenParen); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, ",", Comma); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, ")", CloseParen); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, "do", Do); status {
-		return token
-	} else if token, status := tokenizePattern(*src, i, "n't", Not); status {
-		return token
+func parseToken(src string, i *int) Token {
+	tokenParsers := []func(string, *int) (Token, bool){
+		tokenizeInt,
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, "mul", Mul)
+		},
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, "(", OpenParen)
+		},
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, ",", Comma)
+		},
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, ")", CloseParen)
+		},
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, "do", Do)
+		},
+		func(s string, idx *int) (Token, bool) {
+			return tokenizePattern(s, idx, "n't", Not)
+		},
 	}
+
+	for _, parser := range tokenParsers {
+		if token, ok := parser(src, i); ok {
+			return token
+		}
+	}
+
 	return Token{Type: Invalid}
 }
 
