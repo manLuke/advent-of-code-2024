@@ -2,12 +2,16 @@ package common
 
 import "strconv"
 
+func StringToInt(s string) int {
+	n, err := strconv.Atoi(s)
+	Check(err)
+	return n
+}
+
 func ConvertStringsToInts(strings []string) []int {
 	ints := make([]int, len(strings))
 	for i, s := range strings {
-		n, err := strconv.Atoi(s)
-		Check(err)
-		ints[i] = n
+		ints[i] = StringToInt(s)
 	}
 	return ints
 }
@@ -50,4 +54,16 @@ func CopyMap[K comparable, V any](original map[K]V) map[K]V {
 		newMap[key] = value
 	}
 	return newMap
+}
+
+func ConcatenateNumbers(a, b int) int {
+	strA := strconv.Itoa(a)
+	strB := strconv.Itoa(b)
+
+	concatenatedStr := strA + strB
+
+	concatenatedInt, err := strconv.Atoi(concatenatedStr)
+	Check(err)
+
+	return concatenatedInt
 }

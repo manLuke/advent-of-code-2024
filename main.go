@@ -11,7 +11,9 @@ import (
 	// day05part1 "github.com/manLuke/advent-of-code-2024/day05/part1"
 	// day05part2 "github.com/manLuke/advent-of-code-2024/day05/part2"
 	// day06part1 "github.com/manLuke/advent-of-code-2024/day06/part1"
-	day06part2 "github.com/manLuke/advent-of-code-2024/day06/part2"
+	// day06part2 "github.com/manLuke/advent-of-code-2024/day06/part2"
+	day07part1 "github.com/manLuke/advent-of-code-2024/day07/part1"
+	day07part2 "github.com/manLuke/advent-of-code-2024/day07/part2"
 )
 
 func main() {
@@ -25,5 +27,6 @@ func main() {
 	// day05part1.Solve()
 	// day05part2.Solve()
 	// day06part1.Solve()
-	day06part2.Solve()
+	day07part1.Solve()
+	day07part2.Solve()
 }
