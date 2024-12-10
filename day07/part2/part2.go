@@ -10,7 +10,7 @@ import (
 )
 
 func Solve() {
-	fmt.Println("Advent of Code - Day 7 - Part 1")
+	fmt.Println("Advent of Code - Day 7 - Part 2")
 	sum := calculateSumOfValidEquations(getEquations())
 	fmt.Println("Sum of valid equations:", sum)
 }
